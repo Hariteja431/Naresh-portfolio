@@ -243,7 +243,7 @@ function ParallaxCategory({
         <div className="relative">
           {/* Intense Glossy Glassmorphism Effect */}
           <h2 
-            className="text-[9vw] md:text-[8vw] leading-[0.8] font-black uppercase tracking-tighter font-[var(--font-geist-sans)] text-transparent relative z-10 drop-shadow-2xl"
+            className="text-[8vw] sm:text-[7vw] md:text-[8vw] leading-[0.8] font-black uppercase tracking-tighter font-[var(--font-geist-sans)] text-transparent relative z-10 drop-shadow-2xl"
             style={{ 
               WebkitTextStroke: '2px rgba(255,255,255,0.7)',
               background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.1) 100%)',
