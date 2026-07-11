@@ -27,15 +27,12 @@ body {
   scrollbar-width: none;
 }
 
-@keyframes scroll-down {
-  0% {
-    transform: translateY(-100%);
-  }
-  50% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(100%);
-  }
+@keyframes scrollDown {
+  0% { transform: scaleY(0); transform-origin: top; }
+  40% { transform: scaleY(1); transform-origin: top; }
+  40.1% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
 }
-
+.animate-scroll-down {
+  animation: scrollDown 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
+}

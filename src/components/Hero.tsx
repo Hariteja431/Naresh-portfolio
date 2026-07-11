@@ -1,19 +1,31 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Volume2, VolumeX } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Handle responsive state to prevent text cutoff on mobile screens
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Auto-play audio on first user interaction
   useEffect(() => {
@@ -52,100 +64,92 @@ export default function Hero() {
     }
   };
 
-  const drawMask = (scale: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  useLayoutEffect(() => {
+    let ctx: gsap.Context;
 
-    const dpr = window.devicePixelRatio || 1;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    
-    if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-    }
-    
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    document.fonts.ready.then(() => {
+      const mainText = document.getElementById('main-text') as any;
+      const svg = svgRef.current;
+      
+      if (!mainText || !svg) return;
 
-    ctx.globalCompositeOperation = 'destination-out';
-    
-    ctx.scale(dpr, dpr);
-    
-    const fontSize = w * 0.12; 
-    ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+      // Extract precise coordinates of the letter 'I' directly from the SVG engine.
+      // 'I' is at index 1 in the string "FILMED BY" (F=0, I=1).
+      // This is mathematically flawless and avoids any bounding box bugs!
+      let zoomX = 500;
+      let zoomY = 500;
+      try {
+        const rect = mainText.getExtentOfChar(1);
+        zoomX = rect.x + rect.width / 2;
+        zoomY = rect.y + rect.height / 2;
+      } catch (e) {
+        // Fallback safely if browser engine fails
+      }
 
-    const line1 = 'FILMED BY';
-    const line2 = 'NARESH';
-    
-    const totalW = ctx.measureText(line1).width;
-    const wFI = ctx.measureText('FI').width;
-    const wI = ctx.measureText('I').width;
-    
-    const targetX = (-totalW / 2) + wFI - (wI / 2);
-    const targetY = -fontSize * 0.6; 
-    
-    ctx.translate(w / 2, h / 2);
-    ctx.translate(targetX, targetY);
-    ctx.scale(scale, scale);
-    ctx.translate(-targetX, -targetY);
-    
-    ctx.fillText(line1, 0, -fontSize * 0.6);
-    ctx.fillText(line2, 0, fontSize * 0.6);
-    
-    ctx.globalCompositeOperation = 'source-over';
-  };
+      ctx = gsap.context(() => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top top',
+            end: '+=400%', 
+            scrub: 1.5, 
+            pin: true, 
+          },
+        });
 
-  useEffect(() => {
-    document.fonts.ready.then(() => drawMask(1));
-    
-    const proxy = { scale: 1 };
-
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: '+=400%', 
-          scrub: 1.5, 
-          pin: true,
-          onUpdate: () => drawMask(proxy.scale)
+        const indicator = scrollIndicatorRef.current;
+        if (indicator) {
+          tl.to(indicator, {
+            opacity: 0,
+            y: 30,
+            duration: 0.1,
+            ease: 'power2.out'
+          }, 0);
         }
-      });
 
-      // Canvas Zoom Animation
-      tl.to(proxy, {
-        scale: 150, 
-        ease: 'expo.inOut',
-        duration: 1
-      }, 0);
+        // 1. We use a proxy object to drive the logarithmic zoom. 
+        // This entirely prevents the "jitter" and sudden hyper-speed at the end of linear zooms.
+        const zoomState = { val: 0 };
+        tl.to(zoomState, {
+          val: 1,
+          ease: 'power2.inOut',
+          duration: 1,
+          onUpdate: () => {
+            const progress = zoomState.val;
+            
+            // Only zoom 25x. This keeps the coordinate math incredibly safe and prevents GPU crashes.
+            // The viewBox will shrink from 1000 down to 40.
+            const currentScale = Math.pow(25, progress); 
+            const currentSize = 1000 / currentScale;
+            
+            // Pan smoothly into the 'I'
+            const currentCenterX = 500 + (zoomX - 500) * progress;
+            const currentCenterY = 500 + (zoomY - 500) * progress;
+            
+            const newX = currentCenterX - (currentSize / 2);
+            const newY = currentCenterY - (currentSize / 2);
+            
+            svg.setAttribute('viewBox', `${newX} ${newY} ${currentSize} ${currentSize}`);
+          }
+        }, 0);
 
-      // Fade out the scroll indicator almost immediately when scrolling begins
-      tl.to(scrollIndicatorRef.current, {
-        opacity: 0,
-        ease: 'power2.out',
-        duration: 0.05
-      }, 0);
+        // 2. THE SECRET WEAPON: As we zoom in, we dynamically expand the transparent stroke 
+        // of the text. By the time the camera hits the 40x40 window, the transparent hole 
+        // has expanded to be 150 units wide, completely swallowing the camera!
+        // This guarantees NO black screens, NO jitter, and NO opacity fading!
+        tl.to('#main-text, #sub-text', {
+          attr: { 'stroke-width': 150 },
+          ease: 'power3.in',
+          duration: 1
+        }, 0);
 
-    }, containerRef);
-
-    drawMask(1);
-
-    const handleResize = () => drawMask(proxy.scale);
-    window.addEventListener('resize', handleResize);
+      }, containerRef);
+    });
 
     return () => {
-      ctx.revert();
-      window.removeEventListener('resize', handleResize);
+      if (ctx) ctx.revert();
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-black">
@@ -153,48 +157,90 @@ export default function Hero() {
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <video
           ref={videoRef}
-          src="/hero.mp4"
+          src="/hero_section_video_bg.mp4"
           autoPlay
           muted
           loop
           playsInline
           suppressHydrationWarning
-          className="w-full h-full object-cover origin-center" 
+          className="w-[100vh] h-[100vw] object-cover -rotate-90 origin-center" 
         />
       </div>
 
       {/* Atmospheric Audio */}
       <audio ref={audioRef} src="/audio.mp3" loop />
 
-      {/* Unbreakable HTML5 Canvas Mask */}
-      <canvas 
-        ref={canvasRef}
+      {/* Vector SVG Mask */}
+      <svg 
+        ref={svgRef} 
+        viewBox="0 0 1000 1000" 
+        preserveAspectRatio="xMidYMid slice" 
         className="absolute inset-0 w-full h-full z-10 pointer-events-none"
-      />
+      >
+        <defs>
+          <mask id="textMask">
+            <rect x="-5000" y="-5000" width="10000" height="10000" fill="white" />
+            
+            <g id="text-group">
+              <text 
+                id="main-text"
+                x="500" y={isMobile ? "470" : "460"}
+                textAnchor="middle" 
+                fill="black" 
+                stroke="black"
+                strokeWidth={isMobile ? "1" : "2"} 
+                fontSize={isMobile ? "70" : "140"} 
+                fontWeight="900" 
+                fontFamily="var(--font-geist-sans), sans-serif"
+              >
+                FILMED BY
+              </text>
+              <text 
+                id="sub-text"
+                x="500" y={isMobile ? "550" : "580"}
+                textAnchor="middle" 
+                fill="black" 
+                stroke="black"
+                strokeWidth={isMobile ? "1" : "2"} 
+                fontSize={isMobile ? "70" : "140"} 
+                fontWeight="900" 
+                fontFamily="var(--font-geist-sans), sans-serif"
+              >
+                NARESH
+              </text>
+            </g>
+          </mask>
+        </defs>
+        
+        <rect x="-5000" y="-5000" width="10000" height="10000" fill="black" mask="url(#textMask)" />
+      </svg>
 
-      {/* Cinematic Scroll Indicator */}
+      {/* Sleek Scroll Down Indicator */}
       <div 
         ref={scrollIndicatorRef} 
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-4 text-white/50 pointer-events-none"
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-50 pointer-events-none"
       >
-        <span className="text-[9px] uppercase tracking-[0.3em] font-medium">Scroll to explore</span>
-        <div className="w-[1px] h-12 bg-white/10 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-white/60 animate-[scroll-down_2s_ease-in-out_infinite]" />
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-mono drop-shadow-md">Scroll</span>
+        <div className="w-[1px] h-12 bg-white/20 overflow-hidden relative">
+          <div className="w-full h-full bg-white origin-top animate-scroll-down" />
         </div>
       </div>
 
-      {/* Ultra-Minimalist Audio Toggle */}
+      {/* Modern, Minimal Audio Toggle Button */}
       <button
         onClick={toggleAudio}
-        className="absolute top-10 right-10 z-50 flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-white/60 hover:text-white transition-colors cursor-pointer group"
+        className="absolute top-8 right-8 z-50 flex items-center gap-3 text-white/80 hover:text-white transition-colors cursor-pointer group"
         aria-label="Toggle Audio"
       >
-        <span>{isAudioPlaying ? 'Sound On' : 'Sound Off'}</span>
-        <div className="flex gap-[3px] items-end h-3 overflow-hidden">
-          {/* Equalizer bars that react to playing state */}
-          <div className={`w-[2px] bg-current transition-all duration-300 ease-out origin-bottom ${isAudioPlaying ? 'h-2 group-hover:h-3' : 'h-[2px]'}`} />
-          <div className={`w-[2px] bg-current transition-all duration-300 ease-out origin-bottom delay-75 ${isAudioPlaying ? 'h-3 group-hover:h-2' : 'h-[2px]'}`} />
-          <div className={`w-[2px] bg-current transition-all duration-300 ease-out origin-bottom delay-150 ${isAudioPlaying ? 'h-1.5 group-hover:h-3' : 'h-[2px]'}`} />
+        <span className="hidden md:inline-block text-[10px] uppercase tracking-[0.2em] font-mono transition-colors drop-shadow-md font-medium">
+          {isAudioPlaying ? 'Sound On' : 'Sound Off'}
+        </span>
+        <div className="w-10 h-10 rounded-full border border-white/30 bg-white/10 flex items-center justify-center group-hover:scale-105 group-hover:border-white/60 transition-all duration-300 backdrop-blur-md shadow-lg">
+           {isAudioPlaying ? (
+             <Volume2 className="w-4 h-4 text-white" strokeWidth={2} />
+           ) : (
+             <VolumeX className="w-4 h-4 text-white" strokeWidth={2} />
+           )}
         </div>
       </button>
     </section>
