@@ -150,10 +150,17 @@ function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; 
       </div>
 
       {/* Typography Overlay (Below Video) */}
-      <div className={`flex flex-col gap-3 px-2 ${isHero ? 'items-center text-center' : ''}`}>
-        <p className="text-[13px] md:text-[14px] text-white/80 font-[var(--font-geist-sans)] tracking-wide font-light leading-relaxed">
-          {data.description}
-        </p>
+      <div className={`flex flex-col gap-4 px-2 mt-2 ${isHero ? 'items-center text-center' : ''}`}>
+        
+        {/* Description with Depth & Wow Factor */}
+        <div className={`relative flex items-center ${isHero ? 'justify-center' : 'justify-start'} group/desc cursor-default`}>
+          {!isHero && (
+            <div className="absolute left-0 top-1 bottom-1 w-[2px] bg-white/20 group-hover/desc:bg-white/60 transition-colors duration-500 rounded-full" />
+          )}
+          <p className={`text-[13px] md:text-[14px] text-white/70 group-hover/desc:text-white transition-colors duration-500 font-medium tracking-wide leading-relaxed drop-shadow-md ${isHero ? '' : 'pl-4'}`}>
+            {data.description}
+          </p>
+        </div>
         <div className={`flex items-center w-full ${isHero ? 'justify-center gap-6' : 'justify-between'}`}>
           <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase">
             {(index + 1).toString().padStart(2, '0')} / {total}
