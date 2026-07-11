@@ -135,13 +135,17 @@ function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; 
           />
         </div>
 
-        {/* Custom Minimal Mute Toggle */}
+        {/* Custom Animated Sound Equalizer Toggle */}
         <button 
           onClick={toggleMute}
-          className="absolute bottom-4 right-4 z-30 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition-colors text-white"
+          className="absolute bottom-4 right-4 z-30 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition-colors group/audio"
           aria-label={isMuted ? "Unmute video" : "Mute video"}
         >
-          {isMuted ? <VolumeX className="w-3 h-3 current-color" /> : <Volume2 className="w-3 h-3 current-color" />}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-white group-hover/audio:text-black transition-colors">
+            <rect x="3" y={isMuted ? "11" : "4"} width="4" height={isMuted ? "2" : "16"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-1'}`} />
+            <rect x="10" y={isMuted ? "11" : "8"} width="4" height={isMuted ? "2" : "12"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-2'}`} />
+            <rect x="17" y={isMuted ? "11" : "2"} width="4" height={isMuted ? "2" : "18"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-3'}`} />
+          </svg>
         </button>
       </div>
 
@@ -158,9 +162,15 @@ function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; 
             href="https://www.instagram.com/filmedby.naresh/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="group/btn flex items-center gap-2 rounded-full border border-white/20 px-4 py-1.5 text-[10px] text-white/60 hover:text-black hover:bg-white uppercase tracking-widest font-medium transition-all duration-300 backdrop-blur-sm"
+            className="group/btn relative flex items-center gap-2 text-[10px] text-white/50 hover:text-white uppercase tracking-widest font-medium transition-colors duration-300"
           >
-            View on IG 
+            <span className="relative overflow-hidden flex items-center gap-2">
+              <span className="font-mono text-[9px] text-white/30 opacity-50 group-hover/btn:opacity-100 transition-opacity">{'</>'}</span>
+              <span className="relative">
+                View on IG
+                <span className="absolute left-0 bottom-[-2px] w-full h-[1px] bg-white/40 transform scale-x-100 group-hover/btn:scale-x-0 transition-transform duration-300 origin-right" />
+              </span>
+            </span>
             <span className="transform transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1">↗</span>
           </a>
         </div>

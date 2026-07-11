@@ -54,3 +54,10 @@ body {
 .animate-marquee2 {
   animation: marquee2 45s linear infinite;
 }
+
+@keyframes eq-play { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+@keyframes eq-play-2 { 0%, 100% { height: 8px; } 50% { height: 12px; } }
+@keyframes eq-play-3 { 0%, 100% { height: 2px; } 50% { height: 18px; } }
+.animate-eq-1 { animation: eq-play 1s infinite ease-in-out; }
+.animate-eq-2 { animation: eq-play-2 1.2s infinite ease-in-out; }
+.animate-eq-3 { animation: eq-play-3 0.8s infinite ease-in-out; }

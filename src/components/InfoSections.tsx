@@ -119,8 +119,8 @@ function Services() {
       <div className="mb-16 md:mb-24 services-header">
         <h2 className="text-[12vw] md:text-[6vw] font-black uppercase tracking-tighter text-white leading-[0.85] drop-shadow-2xl">
           Services <br />
-          <span className="text-transparent" style={{ WebkitTextStroke: '2px rgba(255,255,255,0.7)', background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.1) 100%)', WebkitBackgroundClip: 'text' }}>
-            & Expertise.
+          <span className="font-[var(--font-playfair)] italic font-light lowercase tracking-normal text-transparent pr-4" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.7)', background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.1) 100%)', WebkitBackgroundClip: 'text' }}>
+            & expertise.
           </span>
         </h2>
       </div>
@@ -340,7 +340,8 @@ function FooterCTA() {
       
       <div className="w-full max-w-[1600px] mx-auto relative z-10 flex flex-col items-center text-center">
         <h2 className="footer-title text-[15vw] md:text-[10vw] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 leading-[0.85] mb-12 md:mb-16 drop-shadow-2xl">
-          Let's create<br />something.
+          Let's create<br />
+          <span className="font-[var(--font-playfair)] italic lowercase font-light tracking-normal text-white pr-4">something.</span>
         </h2>
         
         <a 
