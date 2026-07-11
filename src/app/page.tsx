@@ -1,16 +1,25 @@
 import Hero from "@/components/Hero";
+import AboutPortrait from "@/components/AboutPortrait";
+import AudioPlayer from "@/components/AudioPlayer";
+import Monograph from "@/components/Monograph";
+import Videography from "@/components/Videography";
+import InfoSections from "@/components/InfoSections";
 
 export default function Home() {
   return (
-    <main className="w-full min-h-screen bg-black">
+    <main className="w-full bg-black">
+      <AudioPlayer />
       <Hero />
-      
-      {/* Spacer section to demonstrate what comes next */}
-      <section className="w-full h-screen flex items-center justify-center bg-black text-white">
-        <h2 className="text-4xl font-light text-neutral-500">The journey begins...</h2>
-      </section>
-      
-      <section className="w-full h-screen bg-neutral-900"></section>
+      <AboutPortrait />
+
+      {/* Cinematic Monograph sequence replacing ZoomParallax & Gallery3D */}
+      <Monograph />
+
+      {/* Scroll-Driven Video Portfolio */}
+      <Videography />
+
+      {/* Bottom Half: Brands, Services, Process, Gear, Footer */}
+      <InfoSections />
     </main>
   );
 }

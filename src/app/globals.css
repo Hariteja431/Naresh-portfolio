@@ -36,3 +36,21 @@ body {
 .animate-scroll-down {
   animation: scrollDown 1.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes marquee2 {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-marquee {
+  animation: marquee 45s linear infinite;
+}
+
+.animate-marquee2 {
+  animation: marquee2 45s linear infinite;
+}

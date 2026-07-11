@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Volume2, VolumeX } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,9 +11,6 @@ export default function Hero() {
   const svgRef = useRef<SVGSVGElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -27,42 +23,7 @@ export default function Hero() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-play audio on first user interaction
-  useEffect(() => {
-    const handleInteraction = () => {
-      if (!hasInteracted && audioRef.current) {
-        audioRef.current.play().then(() => {
-          setIsAudioPlaying(true);
-        }).catch(() => {});
-        setHasInteracted(true);
-      }
-    };
 
-    window.addEventListener('scroll', handleInteraction, { once: true });
-    window.addEventListener('click', handleInteraction, { once: true });
-    window.addEventListener('touchstart', handleInteraction, { once: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleInteraction);
-      window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-    };
-  }, [hasInteracted]);
-
-  const toggleAudio = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    setHasInteracted(true); 
-    if (audioRef.current) {
-      if (isAudioPlaying) {
-        audioRef.current.pause();
-        setIsAudioPlaying(false);
-      } else {
-        audioRef.current.play().then(() => {
-          setIsAudioPlaying(true);
-        }).catch(() => {});
-      }
-    }
-  };
 
   useLayoutEffect(() => {
     let ctx: gsap.Context;
@@ -91,9 +52,10 @@ export default function Hero() {
           scrollTrigger: {
             trigger: containerRef.current,
             start: 'top top',
-            end: '+=400%', 
+            end: '+=250%', 
             scrub: 1.5, 
             pin: true, 
+            refreshPriority: 1,
           },
         });
 
@@ -143,6 +105,13 @@ export default function Hero() {
           duration: 1
         }, 0);
 
+        // Force GSAP to recalculate all downstream ScrollTriggers (like AboutPortrait) 
+        // because this async font-loaded pin adds 400vh to the document height!
+        setTimeout(() => {
+          ScrollTrigger.sort();
+          ScrollTrigger.refresh();
+        }, 50);
+
       }, containerRef);
     });
 
@@ -166,9 +135,6 @@ export default function Hero() {
           className="w-[100vh] h-[100vw] object-cover -rotate-90 origin-center" 
         />
       </div>
-
-      {/* Atmospheric Audio */}
-      <audio ref={audioRef} src="/audio.mp3" loop />
 
       {/* Vector SVG Mask */}
       <svg 
@@ -225,24 +191,6 @@ export default function Hero() {
           <div className="w-full h-full bg-white origin-top animate-scroll-down" />
         </div>
       </div>
-
-      {/* Modern, Minimal Audio Toggle Button */}
-      <button
-        onClick={toggleAudio}
-        className="absolute top-8 right-8 z-50 flex items-center gap-3 text-white/80 hover:text-white transition-colors cursor-pointer group"
-        aria-label="Toggle Audio"
-      >
-        <span className="hidden md:inline-block text-[10px] uppercase tracking-[0.2em] font-mono transition-colors drop-shadow-md font-medium">
-          {isAudioPlaying ? 'Sound On' : 'Sound Off'}
-        </span>
-        <div className="w-10 h-10 rounded-full border border-white/30 bg-white/10 flex items-center justify-center group-hover:scale-105 group-hover:border-white/60 transition-all duration-300 backdrop-blur-md shadow-lg">
-           {isAudioPlaying ? (
-             <Volume2 className="w-4 h-4 text-white" strokeWidth={2} />
-           ) : (
-             <VolumeX className="w-4 h-4 text-white" strokeWidth={2} />
-           )}
-        </div>
-      </button>
     </section>
   );
 }
