@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -165,9 +165,13 @@ function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; 
             className="group/btn relative flex items-center gap-2 text-[10px] text-white/50 hover:text-white uppercase tracking-[0.2em] font-medium transition-colors duration-500 pb-1"
           >
             <span className="relative z-10">View on IG</span>
-            <div className="relative flex items-center justify-center w-3 h-3 overflow-hidden">
-              <span className="absolute transform -translate-x-full translate-y-full group-hover/btn:translate-x-0 group-hover/btn:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">↗</span>
-              <span className="absolute transform translate-x-0 translate-y-0 group-hover/btn:translate-x-full group-hover/btn:-translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">↗</span>
+            <div className="relative flex items-center justify-center w-3 h-3 overflow-hidden ml-1">
+              <span className="absolute transform -translate-x-full translate-y-full group-hover/btn:translate-x-0 group-hover/btn:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">
+                <ArrowUpRight strokeWidth={1.5} className="w-3 h-3" />
+              </span>
+              <span className="absolute transform translate-x-0 translate-y-0 group-hover/btn:translate-x-full group-hover/btn:-translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">
+                <ArrowUpRight strokeWidth={1.5} className="w-3 h-3" />
+              </span>
             </div>
             {/* Elegant animated underline */}
             <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/30 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-500 origin-left ease-[cubic-bezier(0.76,0,0.24,1)]" />
