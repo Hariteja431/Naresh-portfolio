@@ -340,8 +340,7 @@ function FooterCTA() {
       
       <div className="w-full max-w-[1600px] mx-auto relative z-10 flex flex-col items-center text-center">
         <h2 className="footer-title text-[15vw] md:text-[10vw] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 leading-[0.85] mb-12 md:mb-16 drop-shadow-2xl">
-          Let's create<br />
-          <span className="font-[var(--font-playfair)] italic lowercase font-light tracking-normal text-white pr-4">something.</span>
+          Let's create
         </h2>
         
         <a 

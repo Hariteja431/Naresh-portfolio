@@ -162,16 +162,15 @@ function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; 
             href="https://www.instagram.com/filmedby.naresh/" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="group/btn relative flex items-center gap-2 text-[10px] text-white/50 hover:text-white uppercase tracking-widest font-medium transition-colors duration-300"
+            className="group/btn relative flex items-center gap-2 text-[10px] text-white/50 hover:text-white uppercase tracking-[0.2em] font-medium transition-colors duration-500 pb-1"
           >
-            <span className="relative overflow-hidden flex items-center gap-2">
-              <span className="font-mono text-[9px] text-white/30 opacity-50 group-hover/btn:opacity-100 transition-opacity">{'</>'}</span>
-              <span className="relative">
-                View on IG
-                <span className="absolute left-0 bottom-[-2px] w-full h-[1px] bg-white/40 transform scale-x-100 group-hover/btn:scale-x-0 transition-transform duration-300 origin-right" />
-              </span>
-            </span>
-            <span className="transform transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1">↗</span>
+            <span className="relative z-10">View on IG</span>
+            <div className="relative flex items-center justify-center w-3 h-3 overflow-hidden">
+              <span className="absolute transform -translate-x-full translate-y-full group-hover/btn:translate-x-0 group-hover/btn:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">↗</span>
+              <span className="absolute transform translate-x-0 translate-y-0 group-hover/btn:translate-x-full group-hover/btn:-translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">↗</span>
+            </div>
+            {/* Elegant animated underline */}
+            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/30 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-500 origin-left ease-[cubic-bezier(0.76,0,0.24,1)]" />
           </a>
         </div>
       </div>
