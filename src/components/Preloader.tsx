@@ -137,7 +137,7 @@ export default function Preloader() {
           <p className="text-[9px] uppercase tracking-[0.4em] text-white/50 font-mono">
             Loading Experience
           </p>
-          <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-mono tabular-nums">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-white font-mono font-semibold tabular-nums drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
             Est. Time: 00:0{timeLeft}
           </p>
         </div>
