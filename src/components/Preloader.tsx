@@ -5,7 +5,7 @@ import gsap from 'gsap';
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(3);
+  const [timeLeft, setTimeLeft] = useState(10);
   const containerRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
 
@@ -146,7 +146,7 @@ export default function Preloader() {
             Loading Experience
           </p>
           <p className="text-[10px] uppercase tracking-[0.2em] text-white font-mono font-semibold tabular-nums drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
-            Est. Time: 00:0{timeLeft}
+            Est. Time: 00:{timeLeft.toString().padStart(2, '0')}
           </p>
         </div>
       </div>
