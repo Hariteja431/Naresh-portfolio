@@ -132,9 +132,18 @@ export default function Hero() {
           loop
           playsInline
           preload="auto"
-          onCanPlayThrough={() => {
-            (window as any).heroVideoReady = true;
-            window.dispatchEvent(new Event('hero-video-ready'));
+          onProgress={(e) => {
+            const video = e.currentTarget;
+            if (video.buffered.length > 0) {
+              const bufferedSeconds = video.buffered.end(video.buffered.length - 1);
+              const duration = video.duration || 7;
+              if (bufferedSeconds >= 4 || bufferedSeconds >= duration / 2) {
+                if (!(window as any).heroVideoReady) {
+                  (window as any).heroVideoReady = true;
+                  window.dispatchEvent(new Event('hero-video-ready'));
+                }
+              }
+            }
           }}
           suppressHydrationWarning
           className="w-[100vh] h-[100vw] object-cover -rotate-90 origin-center" 

@@ -14,8 +14,10 @@ export default function AudioPlayer() {
       if (!hasInteracted && audioRef.current) {
         audioRef.current.play().then(() => {
           setIsAudioPlaying(true);
-        }).catch(() => {});
-        setHasInteracted(true);
+          setHasInteracted(true);
+        }).catch(() => {
+          // Play failed (e.g. autoplay blocked), do not set hasInteracted to true
+        });
       }
     };
 
