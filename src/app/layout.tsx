@@ -21,8 +21,60 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Filmed by Naresh | Cinematic Portfolio",
-  description: "Independent Indian visual storyteller specializing in photography, cinematography, and aerial filmmaking.",
+  metadataBase: new URL('https://www.instagram.com/filmedby.naresh/'), // Replace with actual domain when deployed
+  title: {
+    default: "Filmed by Naresh | Cinematic Visual Storyteller",
+    template: "%s | Filmed by Naresh",
+  },
+  description: "Independent Indian visual storyteller specializing in travel photography, cinematography, aerial filmmaking, and commercial brand campaigns.",
+  keywords: [
+    "Filmed by Naresh", "Naresh", "Cinematography", "Travel Photography", "Aerial Filmmaking", 
+    "Drone Videography", "Commercial Photography", "Indian Visual Storyteller", "Brand Campaigns", 
+    "Tourism Films", "Lifestyle Photography", "Director of Photography", "Video Editor"
+  ],
+  authors: [{ name: "Naresh", url: "https://www.instagram.com/filmedby.naresh/" }],
+  creator: "Naresh",
+  publisher: "Filmed by Naresh",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    title: "Filmed by Naresh | Cinematic Visual Storyteller",
+    description: "Independent Indian visual storyteller specializing in travel photography, cinematography, and aerial filmmaking.",
+    url: "https://www.instagram.com/filmedby.naresh/",
+    siteName: "Filmed by Naresh",
+    locale: "en_IN",
+    type: "website",
+    images: [
+      {
+        url: "/placeholder.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Filmed by Naresh - Cinematic Portfolio",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Filmed by Naresh | Cinematic Visual Storyteller",
+    description: "Independent Indian visual storyteller specializing in travel photography, cinematography, and aerial filmmaking.",
+    creator: "@filmedbynaresh",
+    images: ["/placeholder.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  category: "Photography & Videography",
 };
 
 export default function RootLayout({
