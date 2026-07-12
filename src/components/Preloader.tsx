@@ -36,13 +36,13 @@ export default function Preloader() {
       window.removeEventListener('keydown', preventKeys);
     };
 
-    const duration = 10.0;
+    const duration = 15.0;
     const counterObj = { val: 0 };
     let isVideoReady = (window as any).heroVideoReady || false;
     let isForcedTimeout = false;
     
-    // 1. The unbreakable 10-second timer. 
-    // It will steadily go from 0 to 90 over 10 seconds.
+    // 1. The unbreakable 15-second timer. 
+    // It will steadily go from 0 to 90 over 15 seconds.
     let tween = gsap.to(counterObj, {
       val: 90,
       duration: duration,
@@ -55,7 +55,7 @@ export default function Preloader() {
         setTimeLeft(remaining);
       },
       onComplete: () => {
-        // HARD TIMEOUT: If 10 seconds pass, force reveal to save the user
+        // HARD TIMEOUT: If 15 seconds pass, force reveal to save the user
         isForcedTimeout = true;
         finishLoading();
       }
@@ -70,14 +70,14 @@ export default function Preloader() {
     };
     window.addEventListener('hero-video-ready', handleVideoReady);
 
-    // 3. The Accelerator: If the video downloads faster than 10 seconds, jump the progress forward!
+    // 3. The Accelerator: If the video downloads faster than 15 seconds, jump the progress forward!
     const handleVideoProgress = ((e: CustomEvent) => {
       if (isVideoReady || isForcedTimeout) return;
       
       const { buffered, target } = e.detail;
       const targetP = Math.min(90, Math.round((buffered / target) * 90));
       
-      // If actual download is ahead of the 10-second simulation, accelerate!
+      // If actual download is ahead of the 15-second simulation, accelerate!
       if (targetP > counterObj.val) {
         gsap.to(counterObj, {
           val: targetP,
