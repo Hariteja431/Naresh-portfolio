@@ -36,48 +36,65 @@ export default function Preloader() {
       window.removeEventListener('keydown', preventKeys);
     };
 
+    const duration = 10.0;
     const counterObj = { val: 0 };
     let isVideoReady = (window as any).heroVideoReady || false;
-    let tween: gsap.core.Tween;
+    let isForcedTimeout = false;
     
+    // 1. The unbreakable 10-second timer. 
+    // It will steadily go from 0 to 90 over 10 seconds.
+    let tween = gsap.to(counterObj, {
+      val: 90,
+      duration: duration,
+      ease: "linear",
+      onUpdate: () => {
+        const p = Math.round(counterObj.val);
+        setProgress(p);
+        // Perfectly map time left to the exact percentage (0% -> 10s, 90% -> 1s)
+        const remaining = Math.max(1, Math.ceil(duration - (p / 90) * duration));
+        setTimeLeft(remaining);
+      },
+      onComplete: () => {
+        // HARD TIMEOUT: If 10 seconds pass, force reveal to save the user
+        isForcedTimeout = true;
+        finishLoading();
+      }
+    });
+    
+    // 2. Early Graceful Exit: If video fully hits target early, reveal instantly!
     const handleVideoReady = () => {
       isVideoReady = true;
-      finishLoading();
+      if (!isForcedTimeout) {
+        finishLoading();
+      }
     };
     window.addEventListener('hero-video-ready', handleVideoReady);
 
+    // 3. The Accelerator: If the video downloads faster than 10 seconds, jump the progress forward!
     const handleVideoProgress = ((e: CustomEvent) => {
-      if (isVideoReady) return;
+      if (isVideoReady || isForcedTimeout) return;
       
       const { buffered, target } = e.detail;
       const targetP = Math.min(90, Math.round((buffered / target) * 90));
       
-      if (tween) tween.kill();
-      
-      tween = gsap.to(counterObj, {
-        val: targetP,
-        duration: 0.3,
-        ease: "power2.out",
-        onUpdate: () => {
-          const p = Math.round(counterObj.val);
-          setProgress(p);
-          // Strictly sync the estimated time to the buffer percentage (0% = 10s, 90% = 1s)
-          setTimeLeft(Math.max(1, Math.ceil(10 - (p / 90) * 9)));
-        }
-      });
+      // If actual download is ahead of the 10-second simulation, accelerate!
+      if (targetP > counterObj.val) {
+        gsap.to(counterObj, {
+          val: targetP,
+          duration: 0.2, // Smooth jump
+          ease: "power2.out",
+          onUpdate: () => {
+            const p = Math.round(counterObj.val);
+            setProgress(p);
+            setTimeLeft(Math.max(1, Math.ceil(duration - (p / 90) * duration)));
+            // Keep the main unbreakable tween synced to this new jumped value
+            tween.progress(p / 90);
+          }
+        });
+      }
     }) as EventListener;
 
     window.addEventListener('hero-video-progress', handleVideoProgress);
-
-    // Initial kickstart just in case progress events are slow to fire initially
-    tween = gsap.to(counterObj, {
-      val: 5,
-      duration: 1.0,
-      ease: "power2.out",
-      onUpdate: () => {
-        setProgress(Math.round(counterObj.val));
-      }
-    });
 
     const finishLoading = () => {
       if (counterObj.val === 100) return;
