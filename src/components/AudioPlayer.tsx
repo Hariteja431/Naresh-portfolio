@@ -57,6 +57,25 @@ export default function AudioPlayer() {
     };
   }, [isAudioPlaying, hasInteracted]);
 
+  // Handle tab visibility changes (pause when minimized/backgrounded)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (audioRef.current && isAudioPlaying) {
+          audioRef.current.pause();
+          // We don't set isAudioPlaying(false) here, so we remember the user's intent to play
+        }
+      } else {
+        if (audioRef.current && isAudioPlaying && hasInteracted) {
+          audioRef.current.play().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isAudioPlaying, hasInteracted]);
+
   const toggleAudio = (e: React.MouseEvent) => {
     e.stopPropagation(); 
     setHasInteracted(true); 

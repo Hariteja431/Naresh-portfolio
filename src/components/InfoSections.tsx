@@ -47,7 +47,7 @@ function BrandsMarquee() {
             {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
               <span 
                 key={idx} 
-                className="mx-8 md:mx-16 text-[8vw] md:text-[5vw] font-black uppercase tracking-tighter text-white/30 transition-transform duration-500 hover:scale-110 hover:text-white cursor-default"
+                className="mx-8 md:mx-16 text-[8vw] md:text-[5vw] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white/90 to-white/20 transition-all duration-500 hover:scale-110 hover:from-white hover:to-white/80 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] cursor-default"
                 style={{ WebkitTextStroke: '1px rgba(255,255,255,0.1)' }}
               >
                 {brand}
@@ -58,7 +58,7 @@ function BrandsMarquee() {
             {[...BRANDS, ...BRANDS, ...BRANDS].map((brand, idx) => (
               <span 
                 key={`overlay-${idx}`} 
-                className="mx-8 md:mx-16 text-[8vw] md:text-[5vw] font-black uppercase tracking-tighter text-white/30 transition-colors duration-500"
+                className="mx-8 md:mx-16 text-[8vw] md:text-[5vw] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white/90 to-white/20 transition-all duration-500"
                 style={{ WebkitTextStroke: '1px rgba(255,255,255,0.1)' }}
               >
                 {brand}
@@ -169,7 +169,7 @@ function Services() {
         </h4>
         <div className="flex flex-wrap gap-2 md:gap-3">
           {CREATIVE_EXPERTISE.map((tag, i) => (
-            <span key={i} className="expertise-tag text-[10px] md:text-[11px] uppercase tracking-wider px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-white text-black font-bold shadow-[0_0_20px_rgba(255,255,255,0.15)] hover:scale-105 transition-transform cursor-default">
+            <span key={i} className="expertise-tag text-[10px] md:text-[11px] uppercase tracking-wider px-4 md:px-5 py-2 md:py-2.5 rounded-full bg-[#111] border border-white/10 text-white/90 shadow-[0_4px_15px_rgba(0,0,0,0.5)] hover:border-white/50 hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 cursor-default">
               {tag}
             </span>
           ))}
@@ -354,26 +354,35 @@ function FooterCTA() {
             <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4" />
           </div>
         </a>
-      </div>
-
-      <div className="w-full max-w-[1600px] mx-auto mt-24 md:mt-48 flex flex-col md:flex-row justify-between items-center gap-6 relative z-10 opacity-70">
-        <p className="text-white/40 text-[9px] md:text-[11px] uppercase tracking-widest font-mono text-center md:text-left">
-          Collaborations / Commercial Projects
-        </p>
-        <div className="flex items-center justify-center gap-6 md:gap-12">
-          <a href={emailLink} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-white/60 hover:text-white text-[9px] md:text-[11px] uppercase tracking-widest transition-colors font-medium">
-            <Mail className="w-3 h-3 md:w-4 md:h-4 text-white/40 group-hover:text-white transition-colors" />
+        
+        {/* Email & IG links directly below button */}
+        <div className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-6 md:gap-12 opacity-90">
+          <a href={emailLink} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 text-white/60 hover:text-white text-[10px] md:text-[12px] uppercase tracking-[0.2em] transition-colors font-medium">
+            <Mail className="w-4 h-4 md:w-5 md:h-5 text-white/40 group-hover:text-white transition-colors" />
             <span>Email</span>
           </a>
-          <a href="https://www.instagram.com/filmedby.naresh/" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 text-white/60 hover:text-white text-[9px] md:text-[11px] uppercase tracking-widest transition-colors font-medium">
-            <svg className="w-3 h-3 md:w-4 md:h-4 text-white/40 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <a href="https://www.instagram.com/filmedby.naresh/" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 text-white/60 hover:text-white text-[10px] md:text-[12px] uppercase tracking-[0.2em] transition-colors font-medium">
+            <svg className="w-4 h-4 md:w-5 md:h-5 text-white/40 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
               <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
             </svg>
             <span>Instagram</span>
           </a>
+          <a href="https://www.youtube.com/@filmedby.naresh" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 text-white/60 hover:text-white text-[10px] md:text-[12px] uppercase tracking-[0.2em] transition-colors font-medium">
+            <svg className="w-4 h-4 md:w-5 md:h-5 text-white/40 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>
+            </svg>
+            <span>YouTube</span>
+          </a>
         </div>
+      </div>
+
+      <div className="w-full max-w-[1600px] mx-auto mt-24 md:mt-32 flex justify-center items-center relative z-10 opacity-50">
+        <p className="text-white/40 text-[9px] md:text-[11px] uppercase tracking-widest font-mono text-center">
+          Collaborations / Commercial Projects
+        </p>
       </div>
     </section>
   );

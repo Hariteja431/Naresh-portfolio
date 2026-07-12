@@ -1,346 +1,322 @@
 'use client';
-
-import { useLayoutEffect, useRef, useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Volume2, VolumeX } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Volume2, VolumeX, ArrowUpRight } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface VideoData {
-  filename: string;
-  description: string;
+const PROMO_VIDEOS = [
+  { filename: 'Alcatel.mp4', title: 'Alcatel', description: 'A sleek, high-energy visual campaign showcasing modern tech.' },
+  { filename: 'Boya.mp4', title: 'Boya', description: 'Crisp audio meets crisp visuals in this commercial product shoot.' },
+  { filename: 'Hosteller.mp4', title: 'The Hosteller', description: 'Capturing the vibrant, nomadic spirit of modern backpacking.' },
+  { filename: 'Hosteller promotion 2.mp4', title: 'Hosteller', description: 'An immersive promotional journey through unique stays.' },
+  { filename: 'ID sShoe.mp4', title: 'ID Shoes', description: 'Dynamic footwork and gritty urban aesthetics.' },
+  { filename: 'Motul.mp4', title: 'Motul', description: 'High-octane automotive storytelling fueled by pure adrenaline.' },
+  { filename: 'Samsung.mp4', title: 'Samsung', description: 'Minimalist, premium cinematography for a global brand.' },
+  { filename: 'Torras.mp4', title: 'Torras', description: 'Highlighting innovative product design with fluid camera work.' },
+  { filename: 'Triumph.mp4', title: 'Triumph', description: 'Raw power and heritage captured on the open road.' },
+  { filename: 'carrypro.mp4', title: 'CarryPro', description: 'Showcasing rugged utility with cinematic flair.' },
+  { filename: 'control z.mp4', title: 'Control Z', description: 'A fast-paced, contemporary promotional sequence.' },
+  { filename: 'doodle.mp4', title: 'Doodle', description: 'Creative, vibrant, and deeply engaging brand storytelling.' },
+  { filename: 'AAFT.mp4', title: 'AAFT', description: 'Capturing the essence of education and artistic pursuit.' }
+];
+
+const TRAVEL_VIDEOS = [
+  { filename: 'City Dawn.mp4', title: 'City Dawn', description: 'A quiet, sweeping look at the metropolis as it wakes.' },
+  { filename: 'Kerala.mp4', title: 'Kerala', description: 'Lush greenery and serene backwaters in God\'s Own Country.' },
+  { filename: 'Leh Ladhakh.mp4', title: 'Leh Ladakh', description: 'Breathtaking aerials over majestic, rugged mountainscapes.' },
+  { filename: 'Munnar.mp4', title: 'Munnar', description: 'Mist-kissed tea gardens captured from the clouds.' },
+  { filename: 'Nature drone shot.mp4', title: 'Nature', description: 'An ethereal drone sequence floating through the wilderness.' },
+  { filename: 'Night Aerial.mp4', title: 'Night Aerial', description: 'The electric pulse of the city captured from above.' },
+  { filename: 'Qutub Shahi Tombs.mp4', title: 'Qutub Shahi', description: 'Ancient heritage preserved in sweeping, cinematic light.' },
+  { filename: 'Uttrakhand.mp4', title: 'Uttarakhand', description: 'A soulful journey through the majestic northern peaks.' },
+  { filename: 'cinemetography.mp4', title: 'Cinematography', description: 'A curated montage of lighting, composition, and mood.' },
+  { filename: 'Shoot2.mp4', title: 'Creative Vision', description: 'Behind the lens of a highly stylized creative project.' },
+  { filename: 'Shoot3.mp4', title: 'The Process', description: 'Raw, unfiltered moments of cinematic creation.' },
+  { filename: 'Shoot4.mp4', title: 'Wanderlust', description: 'A visual diary of movement and exploration.' },
+  { filename: 'shoot1.mp4', title: 'Visual Poetry', description: 'Experimental lighting and atmospheric storytelling.' }
+];
+
+interface CategoryStageProps {
+  categoryId: string;
+  title: string;
+  subtitle: string;
+  videos: { filename: string; title: string; description: string }[];
 }
 
-const PROMO_VIDEOS: VideoData[] = [
-  { filename: 'AAFT.mp4', description: 'Cinematic promotional campaign for AAFT.' },
-  { filename: 'Alcatel.mp4', description: 'High-impact product promo for Alcatel.' },
-  { filename: 'Boya.mp4', description: 'Dynamic audio gear promotion for Boya.' },
-  { filename: 'carrypro.mp4', description: 'Lifestyle product showcase for CarryPro.' },
-  { filename: 'control z.mp4', description: 'Sleek tech promotion for Control Z.' },
-  { filename: 'doodle.mp4', description: 'Creative brand spot for Doodle.' },
-  { filename: 'Hosteller promotion 2.mp4', description: 'Immersive travel promotion for The Hosteller.' },
-  { filename: 'Hosteller.mp4', description: 'Lifestyle and destination shoot for The Hosteller.' },
-  { filename: 'ID sShoe.mp4', description: 'Urban footwear campaign for ID Shoes.' },
-  { filename: 'Motul.mp4', description: 'High-octane automotive promotion for Motul.' },
-  { filename: 'Triumph.mp4', description: 'Adrenaline-fueled motorcycle spot for Triumph.' },
-  { filename: 'Torras.mp4', description: 'Modern accessory promotion for Torras.' },
-  { filename: 'Samsung.mp4', description: 'Premium tech showcase for Samsung.' },
-];
-
-const TRAVEL_VIDEOS: VideoData[] = [
-  { filename: 'cinemetography.mp4', description: 'Atmospheric cinematic reel.' },
-  { filename: 'City Dawn.mp4', description: 'Urban awakening captured at first light.' },
-  { filename: 'Kerala.mp4', description: 'Lush landscapes and vibrant culture of Kerala.' },
-  { filename: 'Leh Ladhakh.mp4', description: 'Expansive mountain vistas of Leh Ladakh.' },
-  { filename: 'Munnar.mp4', description: 'Serene tea gardens and rolling hills of Munnar.' },
-  { filename: 'Nature drone shot.mp4', description: 'Breathtaking aerial perspective of untouched nature.' },
-  { filename: 'Night Aerial.mp4', description: 'Cinematic drone journey through the night sky.' },
-  { filename: 'Qutub Shahi Tombs.mp4', description: 'Architectural majesty of the Qutub Shahi Tombs.' },
-  { filename: 'shoot1.mp4', description: 'Visual storytelling and creative cinematography.' },
-  { filename: 'Shoot2.mp4', description: 'Dynamic action and narrative sequence.' },
-  { filename: 'Uttrakhand.mp4', description: 'Majestic alpine landscapes of Uttarakhand.' },
-  { filename: 'Shoot4.mp4', description: 'Experimental cinematography and visual flow.' },
-  { filename: 'Shoot3.mp4', description: 'Evocative mood piece and lighting study.' },
-];
-
-// Reusable Video Player Component 
-// Now featuring Glassmorphic interior UI & Hover scaling
-function VideoPlayer({ data, index, total, isHero = false }: { data: VideoData; index: number; total: number; isHero?: boolean }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+function CategoryStage({ categoryId, title, subtitle, videos }: CategoryStageProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for autoplay (strict 50% threshold to save RAM)
+  // High-Impact Motion Graphic Reveal (Vertical Slit -> Full Screen)
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !containerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            video.play().then(() => setIsPlaying(true)).catch(() => {});
-          } else {
-            video.pause();
-            setIsPlaying(false);
+    const ctx = gsap.context(() => {
+      if (sectionRef.current) {
+        gsap.fromTo(sectionRef.current, {
+          clipPath: 'polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%)',
+          opacity: 0,
+          scale: 0.85,
+          filter: 'blur(10px)'
+        }, {
+          clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+          opacity: 1,
+          scale: 1,
+          filter: 'blur(0px)',
+          duration: 1.4,
+          ease: 'power4.inOut',
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 75%', 
+            toggleActions: 'play none none reverse'
           }
         });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(containerRef.current);
-
-    return () => {
-      observer.disconnect();
-      video.pause(); 
-      setIsPlaying(false);
-    };
+      }
+    }, sectionRef);
+    return () => ctx.revert();
   }, []);
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setProgress((videoRef.current.currentTime / videoRef.current.duration) * 100);
-    }
+  useEffect(() => {
+    videoRefs.current.forEach((vid, idx) => {
+      if (!vid) return;
+      if (idx === activeIndex) {
+        vid.currentTime = 0;
+        vid.play().catch(() => {});
+      } else {
+        vid.pause();
+      }
+    });
+  }, [activeIndex]);
+
+  const handleTimeUpdate = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    setProgress((video.currentTime / video.duration) * 100);
+  };
+
+  const changeVideo = (newIndex: number) => {
+    setActiveIndex(newIndex);
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      const nextMuted = !isMuted;
-      videoRef.current.muted = nextMuted;
-      setIsMuted(nextMuted);
-
-      if (nextMuted) {
-        window.dispatchEvent(new Event('play-main-music'));
-      } else {
-        window.dispatchEvent(new Event('pause-main-music'));
-      }
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    
+    // If the user UNMUTES a video in this section, automatically pause the main background song
+    if (!newMutedState) {
+      window.dispatchEvent(new Event('pause-main-music'));
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (!isMuted) {
-         window.dispatchEvent(new Event('play-main-music'));
-      }
-    };
-  }, [isMuted]);
-
   return (
-    <div ref={containerRef} className={`video-card flex flex-col gap-4 w-full group cursor-pointer ${isHero ? 'md:w-[60%] mx-auto' : ''}`}>
-      <div 
-        className={`relative w-full rounded-2xl overflow-hidden border border-white/10 bg-zinc-900 shadow-2xl transition-transform duration-[0.8s] cubic-bezier(0.16, 1, 0.3, 1) group-hover:scale-[1.02] group-hover:z-50 ${isPlaying ? 'scale-[1.01]' : 'scale-100'}`}
-        style={{ aspectRatio: isHero ? '16/9' : '9/16' }}
-      >
-        <video
-          suppressHydrationWarning
-          ref={videoRef}
-          src={`/video/${data.filename}`}
-          preload="none"
-          muted={isMuted}
-          playsInline
-          loop
-          onTimeUpdate={handleTimeUpdate}
-          className="w-full h-full object-cover transition-opacity duration-500"
-        />
-
-        {/* Minimal Progress Bar */}
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-black/40 z-20">
-          <div 
-            className="h-full bg-white/70 transition-all duration-75 ease-linear" 
-            style={{ width: `${progress}%` }} 
-          />
-        </div>
-
-        {/* Custom Animated Sound Equalizer Toggle */}
-        <button 
-          onClick={toggleMute}
-          className="absolute bottom-4 right-4 z-30 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 hover:bg-white hover:text-black transition-colors group/audio"
-          aria-label={isMuted ? "Unmute video" : "Mute video"}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-white group-hover/audio:text-black transition-colors">
-            <rect x="3" y={isMuted ? "11" : "4"} width="4" height={isMuted ? "2" : "16"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-1'}`} />
-            <rect x="10" y={isMuted ? "11" : "8"} width="4" height={isMuted ? "2" : "12"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-2'}`} />
-            <rect x="17" y={isMuted ? "11" : "2"} width="4" height={isMuted ? "2" : "18"} className={`origin-center transition-all duration-300 ${!isMuted && 'animate-eq-3'}`} />
-          </svg>
-        </button>
-      </div>
-
-      {/* Typography Overlay (Below Video) */}
-      <div className={`flex flex-col gap-4 px-2 mt-2 ${isHero ? 'items-center text-center' : ''}`}>
-        
-        {/* Description with Depth & Wow Factor */}
-        <div className={`relative flex items-center ${isHero ? 'justify-center' : 'justify-start'} group/desc cursor-default`}>
-          {!isHero && (
-            <div className="absolute left-0 top-1 bottom-1 w-[2px] bg-white/20 group-hover/desc:bg-white/60 transition-colors duration-500 rounded-full" />
-          )}
-          <p className={`text-[13px] md:text-[14px] text-white/70 group-hover/desc:text-white transition-colors duration-500 font-medium tracking-wide leading-relaxed drop-shadow-md ${isHero ? '' : 'pl-4'}`}>
-            {data.description}
-          </p>
-        </div>
-        <div className={`flex items-center w-full ${isHero ? 'justify-center gap-6' : 'justify-between'}`}>
-          <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase">
-            {(index + 1).toString().padStart(2, '0')} / {total}
-          </span>
-          <a 
-            href="https://www.instagram.com/filmedby.naresh/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group/btn relative flex items-center gap-2 text-[10px] text-white/50 hover:text-white uppercase tracking-[0.2em] font-medium transition-colors duration-500 pb-1"
-          >
-            <span className="relative z-10">View on IG</span>
-            <div className="relative flex items-center justify-center w-3 h-3 overflow-hidden ml-1">
-              <span className="absolute transform -translate-x-full translate-y-full group-hover/btn:translate-x-0 group-hover/btn:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">
-                <ArrowUpRight strokeWidth={1.5} className="w-3 h-3" />
-              </span>
-              <span className="absolute transform translate-x-0 translate-y-0 group-hover/btn:translate-x-full group-hover/btn:-translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]">
-                <ArrowUpRight strokeWidth={1.5} className="w-3 h-3" />
-              </span>
-            </div>
-            {/* Elegant animated underline */}
-            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/30 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-500 origin-left ease-[cubic-bezier(0.76,0,0.24,1)]" />
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Reusable Parallax Grid Section Component to prevent overlaps and standardize physics
-function ParallaxCategory({ 
-  title, 
-  subtitle, 
-  description, 
-  videos, 
-  sectionId 
-}: { 
-  title: string, 
-  subtitle: string, 
-  description: string, 
-  videos: VideoData[],
-  sectionId: string
-}) {
-  // Extract the 13th video to use as a centered Hero Finale
-  const gridVideos = videos.slice(0, 12);
-  const finaleVideo = videos[12];
-
-  const col1 = gridVideos.filter((_, i) => i % 3 === 0);
-  const col2 = gridVideos.filter((_, i) => i % 3 === 1);
-  const col3 = gridVideos.filter((_, i) => i % 3 === 2);
-
-  useLayoutEffect(() => {
-    let ctx = gsap.context(() => {
+    <div ref={sectionRef} className={`w-full py-16 md:py-24 flex flex-col items-center relative z-10 ${categoryId}-stage will-change-[transform,clip-path] perspective-[1200px]`}>
       
-      // Use matchMedia to disable parallax on mobile completely, preventing overlap
-      const mm = gsap.matchMedia();
+      {/* Dynamic Aurora Ambient Background */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <div className="w-[150%] max-w-[1200px] h-[80%] bg-gradient-to-tr from-purple-600/30 via-blue-500/20 to-emerald-400/30 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[4000ms] opacity-60" />
+      </div>
 
-      mm.add("(min-width: 768px)", () => {
-        // Central column moves UP faster than scroll
-        gsap.to(`.${sectionId}-col-2`, {
-          yPercent: -15, 
-          ease: 'none',
-          scrollTrigger: {
-            trigger: `.${sectionId}-wrap`,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          }
-        });
+      <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-8 relative z-20 flex flex-col items-center">
         
-        // Outer columns move DOWN slightly against scroll
-        gsap.to(`.${sectionId}-col-1, .${sectionId}-col-3`, {
-          yPercent: 5,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: `.${sectionId}-wrap`,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          }
-        });
-      });
-      
-    });
+        {/* Cinematic Header */}
+        <div className="mb-4 md:mb-6 flex flex-col items-center text-center">
+           <h2 className="text-3xl md:text-5xl font-serif italic tracking-wider text-white mb-1 md:mb-2 shadow-black drop-shadow-2xl">{title}</h2>
+           <p className="text-[10px] md:text-sm text-zinc-400 tracking-[0.2em] uppercase font-light">{subtitle}</p>
+        </div>
 
-    return () => ctx.revert();
-  }, [sectionId]);
+        {/* Featured Video Stage (9:16 Vertical Monolith) */}
+        <div className="relative w-full flex flex-col items-center perspective-[1000px]">
+           
+           {/* WOW Factor: 3D Stage Tilt */}
+           <div 
+             className="relative h-[48vh] md:h-[55vh] max-h-[600px] min-h-[350px] aspect-[9/16] rounded-xl overflow-hidden border border-white/5 bg-zinc-950 shadow-[0_20px_50px_rgba(255,255,255,0.02)] group/stage transition-transform duration-700 ease-out hover:scale-[1.02]"
+           >
+             
+             {videos.map((data, idx) => {
+               const isActive = idx === activeIndex;
+               // Pure, elegant crossfade to prevent any black clipping or unequal zoom
+               return (
+                 <video
+                   key={data.filename}
+                   ref={el => { videoRefs.current[idx] = el }}
+                   src={isActive ? `/video/${data.filename}` : undefined} // FIXED: use undefined instead of '' to prevent crash
+                   poster={isActive ? undefined : '/placeholder.jpg'}
+                   muted={isMuted}
+                   playsInline
+                   loop
+                   suppressHydrationWarning
+                   onTimeUpdate={isActive ? handleTimeUpdate : undefined}
+                   className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1.2s] ease-[cubic-bezier(0.76,0,0.24,1)] will-change-[opacity,transform] ${
+                     isActive 
+                       ? 'opacity-100 scale-100 z-10' 
+                       : 'opacity-0 scale-[1.01] z-0'
+                   }`}
+                 />
+               );
+             })}
 
-  return (
-    <div className={`${sectionId}-wrap w-full max-w-[1600px] mx-auto px-[5vw] mb-12 pb-[5vh] relative`}>
-      
-      {/* Massive Background Watermark for Wow Factor */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none flex items-center justify-center -z-10 opacity-5">
-        <h2 className="text-[30vw] font-black uppercase text-white whitespace-nowrap rotate-[-10deg] tracking-tighter">
-          {title}
-        </h2>
+             {/* Animated Progress Line (Inside Bottom Edge) */}
+             <div className="absolute bottom-0 left-0 w-full h-[2px] bg-black/60 z-20 transition-opacity duration-1000">
+               <div 
+                 className="h-full bg-gradient-to-r from-white/40 via-white to-white/40 transition-all duration-75 ease-linear shadow-[0_0_10px_rgba(255,255,255,0.8)]" 
+                 style={{ width: `${progress}%` }} 
+               />
+             </div>
+           </div>
+
+           {/* Dynamic Video Title & One-Liner Description */}
+           <div className="mt-4 md:mt-6 flex flex-col items-center text-center px-4 max-w-xl h-[55px] md:h-[60px] justify-start transition-opacity duration-500">
+              <h3 className="text-base md:text-xl font-serif text-white tracking-[0.2em] uppercase opacity-90">{videos[activeIndex].title}</h3>
+              <p className="text-[10px] md:text-sm text-zinc-400 mt-1 md:mt-2 font-light italic tracking-wide">{videos[activeIndex].description}</p>
+           </div>
+
+           {/* External Controls & Film Strip (Centered matching the mock) */}
+           <div className="w-full mt-2 flex flex-col items-center z-30 pointer-events-auto">
+              
+              {/* Controls Row (Perfectly Centered & Uniform Layout) */}
+              <div className="relative flex items-center justify-between w-full max-w-[360px] md:max-w-[500px] mb-6 md:mb-8 px-2 md:px-0">
+                
+                {/* Left: Nav Buttons */}
+                <div className="flex items-center gap-2 md:gap-4 flex-shrink-0 w-[100px] md:w-[128px] justify-start z-10">
+                  <button 
+                     onClick={() => changeVideo((activeIndex - 1 + videos.length) % videos.length)}
+                     className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-[#141414] flex items-center justify-center border border-white/5 hover:bg-white hover:text-black transition-colors duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] flex-shrink-0"
+                  >
+                     <ArrowLeft strokeWidth={1.5} className="w-4 h-4 md:w-6 md:h-6" />
+                  </button>
+                  <button 
+                     onClick={() => changeVideo((activeIndex + 1) % videos.length)}
+                     className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-[#141414] flex items-center justify-center border border-white/5 hover:bg-white hover:text-black transition-colors duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] flex-shrink-0"
+                  >
+                     <ArrowRight strokeWidth={1.5} className="w-4 h-4 md:w-6 md:h-6" />
+                  </button>
+                </div>
+                
+                {/* Center: IG Link (Absolutely Centered for perfect visual balance) */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-0 whitespace-nowrap">
+                  <a 
+                     href="https://www.instagram.com/filmedby.naresh/" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="group/btn flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[13px] text-white/80 hover:text-white uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold transition-colors duration-300"
+                  >
+                     <span>View on IG</span>
+                     <ArrowUpRight strokeWidth={2} className="w-3 h-3 md:w-4 md:h-4 group-hover/btn:-translate-y-[2px] group-hover/btn:translate-x-[2px] transition-transform duration-300" />
+                  </a>
+                </div>
+
+                {/* Right: Sleek Modern Sound Button */}
+                <div className="flex items-center justify-end flex-shrink-0 w-[100px] md:w-[128px] z-10">
+                  <button 
+                     onClick={toggleMute}
+                     className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-[#141414] flex items-center justify-center border border-white/5 hover:bg-white hover:text-black transition-colors duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.5)] text-white/80 hover:text-black flex-shrink-0"
+                     aria-label={isMuted ? "Unmute video" : "Mute video"}
+                  >
+                     {isMuted ? <VolumeX strokeWidth={1.5} className="w-4 h-4 md:w-6 md:h-6" /> : <Volume2 strokeWidth={1.5} className="w-4 h-4 md:w-6 md:h-6" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Ultra-Realistic Film Strip Rail */}
+              <div 
+                 className="w-full max-w-[1000px] flex flex-col relative overflow-hidden rounded-[4px] border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.07)] mt-4"
+                 style={{ 
+                   background: 'linear-gradient(to bottom, #111 0%, #1c1c1c 10%, #0d0d0d 25%, #000 50%, #0d0d0d 75%, #1c1c1c 90%, #111 100%)',
+                   boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)'
+                 }}
+              >
+                 {/* Glossy Celluloid Sheen Overlay */}
+                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/[0.08] via-white/[0.01] to-transparent z-20"></div>
+                 
+                 {/* Top Perforation Strip */}
+                 <div className="w-full h-10 flex items-center justify-between px-2 relative z-10 border-b border-black/80">
+                    {Array.from({ length: 65 }).map((_, i) => (
+                       <div 
+                          key={`top-${i}`} 
+                          className="w-3 h-4 rounded-[3px] bg-black flex-shrink-0 mx-[5px]" 
+                          style={{ boxShadow: 'inset 0 3px 6px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.15)' }} 
+                       />
+                    ))}
+                 </div>
+                 
+                 {/* Main Video Track */}
+                 <div className="w-full py-5 relative overflow-hidden z-10 bg-[#050505]/90 border-y border-white/[0.02]">
+                    <div 
+                       className="flex items-center gap-4 transition-transform duration-[0.8s] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
+                       style={{ transform: `translateX(calc(50% - ${(activeIndex * 164) + 74}px))` }} // 148px width + 16px gap = 164px. Center = 148/2 = 74px
+                    >
+                       {videos.map((data, idx) => {
+                          const isActive = idx === activeIndex;
+                          return (
+                             <div 
+                                key={data.filename}
+                                onClick={() => changeVideo(idx)}
+                                className={`flex-shrink-0 relative w-[148px] aspect-[16/9] rounded-sm overflow-hidden cursor-pointer transition-all duration-500 ${
+                                   isActive 
+                                    ? 'border-[1.5px] border-white/90 scale-100 z-10 brightness-100 shadow-[0_0_15px_rgba(255,255,255,0.1)]' 
+                                    : 'border border-transparent scale-[0.95] z-0 brightness-[0.25] grayscale hover:brightness-[0.5]'
+                                }`}
+                             >
+                                <video 
+                                  src={`/video/${data.filename}`} 
+                                  className="w-full h-full object-cover pointer-events-none"
+                                  preload="metadata"
+                                  suppressHydrationWarning
+                                />
+                             </div>
+                          );
+                       })}
+                    </div>
+                 </div>
+
+                 {/* Bottom Perforation Strip */}
+                 <div className="w-full h-10 flex items-center justify-between px-2 relative z-10 border-t border-black/80">
+                    {Array.from({ length: 65 }).map((_, i) => (
+                       <div 
+                          key={`bottom-${i}`} 
+                          className="w-3 h-4 rounded-[3px] bg-black flex-shrink-0 mx-[5px]"
+                          style={{ boxShadow: 'inset 0 -3px 6px rgba(0,0,0,1), 0 -1px 0 rgba(255,255,255,0.12)' }} 
+                       />
+                    ))}
+                 </div>
+              </div>
+
+           </div>
+        </div>
       </div>
-
-      {/* Architectural Glassmorphic Header */}
-      <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between border-b border-white/20 pb-8 gap-6 relative z-10">
-        <div className="relative">
-          {/* Intense Glossy Glassmorphism Effect */}
-          <h2 
-            className="text-[8vw] sm:text-[7vw] md:text-[8vw] leading-[0.8] font-black uppercase tracking-tighter font-[var(--font-geist-sans)] text-transparent relative z-10 drop-shadow-2xl"
-            style={{ 
-              WebkitTextStroke: '2px rgba(255,255,255,0.7)',
-              background: 'linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0.1) 100%)',
-              WebkitBackgroundClip: 'text'
-            }}
-          >
-            {title}
-          </h2>
-          {/* Ambient Glow */}
-          <div className="absolute top-0 left-0 w-full h-full bg-white/5 blur-[100px] -z-10 rounded-full" />
-          
-          <h3 className="text-[5vw] md:text-[2.5vw] font-serif italic text-white/50 mt-4 tracking-widest relative z-10">
-            {subtitle}
-          </h3>
-        </div>
-        <p className="text-white/40 font-mono text-[10px] md:text-[12px] uppercase tracking-widest max-w-[200px] text-left md:text-right">
-          {description}
-        </p>
-      </div>
-
-      {/* 3-Column Parallax Grid (12 Videos) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-[15vw] md:gap-[3vw] items-start relative z-20">
-        
-        {/* Column 1 */}
-        <div className={`${sectionId}-col-1 flex flex-col gap-[15vw] md:gap-[6vw] md:pt-[5vh]`}>
-          {col1.map((data, idx) => (
-            <VideoPlayer key={data.filename} data={data} index={idx * 3} total={videos.length} />
-          ))}
-        </div>
-
-        {/* Column 2 (The Core Parallax Fast Column) */}
-        <div className={`${sectionId}-col-2 flex flex-col gap-[15vw] md:gap-[6vw] md:-mt-[5vh]`}>
-          {col2.map((data, idx) => (
-            <VideoPlayer key={data.filename} data={data} index={(idx * 3) + 1} total={videos.length} />
-          ))}
-        </div>
-
-        {/* Column 3 */}
-        <div className={`${sectionId}-col-3 flex flex-col gap-[15vw] md:gap-[6vw] md:pt-[15vh]`}>
-          {col3.map((data, idx) => (
-            <VideoPlayer key={data.filename} data={data} index={(idx * 3) + 2} total={videos.length} />
-          ))}
-        </div>
-
-      </div>
-
-      {/* Center The 13th Video as a Massive Finale */}
-      {finaleVideo && (
-        <div className="mt-[20vw] md:mt-[30vh] w-full flex justify-center relative z-30">
-          <VideoPlayer data={finaleVideo} index={12} total={videos.length} isHero={true} />
-        </div>
-      )}
-
     </div>
   );
 }
 
 export default function Videography() {
+  const containerRef = useRef<HTMLElement>(null);
+
   return (
-    <section className="relative w-full bg-black pt-32 overflow-clip">
+    <section ref={containerRef} className="relative w-full bg-black pt-12 md:pt-32 pb-24 overflow-clip font-[var(--font-geist-sans)]">
       
-      <ParallaxCategory 
-        sectionId="promo"
-        title="PROMOTIONAL"
+      {/* Category 1: Promotional */}
+      {/* Simple, subtle reveal animations are handled inside each CategoryStage component */}
+      <CategoryStage 
+        categoryId="promo"
+        title="Promotional"
         subtitle="Brand Campaigns & Shoots."
-        description="01 — Commercial portfolio curated for extreme kinetic depth."
         videos={PROMO_VIDEOS}
       />
 
-      <ParallaxCategory 
-        sectionId="cinema"
-        title="CINEMATOGRAPHY"
+      {/* Category 2: Travel & Cinematography */}
+      {/* Removed the heavy pinned shutter transition completely to avoid black screens and long scrolls */}
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-16 md:my-32" />
+      
+      <CategoryStage 
+        categoryId="cinema"
+        title="Cinematography"
         subtitle="Nature, Aerial, & Travel."
-        description="02 — Breathtaking landscapes structured for maximum parallax scale."
         videos={TRAVEL_VIDEOS}
       />
 
     </section>
   );
 }
+
