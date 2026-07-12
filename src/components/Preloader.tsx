@@ -36,11 +36,13 @@ export default function Preloader() {
       window.removeEventListener('keydown', preventKeys);
     };
 
-    // 2. Animate the counter from 0 to 90
-    const duration = 2.0; // Initial simulated load time
+    // 2. Animate the counter from 0 to 90 over a safe maximum time (10 seconds)
+    // This allows the estimated time to be mathematically consistent.
+    const duration = 10.0; 
     const counterObj = { val: 0 };
     
     let isVideoReady = (window as any).heroVideoReady || false;
+    let tween: gsap.core.Tween;
     
     const handleVideoReady = () => {
       isVideoReady = true;
@@ -49,17 +51,17 @@ export default function Preloader() {
 
     window.addEventListener('hero-video-ready', handleVideoReady);
 
-    let tween = gsap.to(counterObj, {
+    tween = gsap.to(counterObj, {
       val: 90,
       duration: duration,
-      ease: "power2.inOut",
+      ease: "power2.out",
       onUpdate: () => {
         const p = Math.round(counterObj.val);
         setProgress(p);
-        // Map progress to estimated time remaining (3s -> 1s)
-        if (p < 30) setTimeLeft(3);
-        else if (p < 60) setTimeLeft(2);
-        else setTimeLeft(1);
+        // Calculate remaining time perfectly based on progress
+        const timePassed = (p / 90) * duration;
+        const remaining = Math.max(1, Math.ceil(duration - timePassed));
+        setTimeLeft(remaining);
       },
       onComplete: () => {
         if (isVideoReady) {
@@ -70,6 +72,9 @@ export default function Preloader() {
 
     const finishLoading = () => {
       if (counterObj.val === 100) return;
+      
+      // Kill the slow tween if it finishes early!
+      if (tween) tween.kill();
       
       gsap.to(counterObj, {
         val: 100,
