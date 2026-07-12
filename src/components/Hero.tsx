@@ -137,6 +137,12 @@ export default function Hero() {
             if (video.buffered.length > 0) {
               const bufferedSeconds = video.buffered.end(video.buffered.length - 1);
               const duration = video.duration || 7;
+              
+              // Broadcast exact buffer progress to sync the UI loader
+              window.dispatchEvent(new CustomEvent('hero-video-progress', { 
+                detail: { buffered: bufferedSeconds, target: Math.min(4, duration / 2) } 
+              }));
+
               if (bufferedSeconds >= 4 || bufferedSeconds >= duration / 2) {
                 if (!(window as any).heroVideoReady) {
                   (window as any).heroVideoReady = true;

@@ -36,11 +36,7 @@ export default function Preloader() {
       window.removeEventListener('keydown', preventKeys);
     };
 
-    // 2. Animate the counter from 0 to 90 over a safe maximum time (10 seconds)
-    // This allows the estimated time to be mathematically consistent.
-    const duration = 10.0; 
     const counterObj = { val: 0 };
-    
     let isVideoReady = (window as any).heroVideoReady || false;
     let tween: gsap.core.Tween;
     
@@ -48,26 +44,38 @@ export default function Preloader() {
       isVideoReady = true;
       finishLoading();
     };
-
     window.addEventListener('hero-video-ready', handleVideoReady);
 
-    // Strict real-time countdown every 1000ms
-    const timerInterval = setInterval(() => {
-      setTimeLeft((prev) => Math.max(1, prev - 1));
-    }, 1000);
+    const handleVideoProgress = ((e: CustomEvent) => {
+      if (isVideoReady) return;
+      
+      const { buffered, target } = e.detail;
+      const targetP = Math.min(90, Math.round((buffered / target) * 90));
+      
+      if (tween) tween.kill();
+      
+      tween = gsap.to(counterObj, {
+        val: targetP,
+        duration: 0.3,
+        ease: "power2.out",
+        onUpdate: () => {
+          const p = Math.round(counterObj.val);
+          setProgress(p);
+          // Strictly sync the estimated time to the buffer percentage (0% = 10s, 90% = 1s)
+          setTimeLeft(Math.max(1, Math.ceil(10 - (p / 90) * 9)));
+        }
+      });
+    }) as EventListener;
 
+    window.addEventListener('hero-video-progress', handleVideoProgress);
+
+    // Initial kickstart just in case progress events are slow to fire initially
     tween = gsap.to(counterObj, {
-      val: 90,
-      duration: duration,
+      val: 5,
+      duration: 1.0,
       ease: "power2.out",
       onUpdate: () => {
-        const p = Math.round(counterObj.val);
-        setProgress(p);
-      },
-      onComplete: () => {
-        if (isVideoReady) {
-          finishLoading();
-        }
+        setProgress(Math.round(counterObj.val));
       }
     });
 
@@ -76,7 +84,6 @@ export default function Preloader() {
       
       // Kill the slow tween if it finishes early!
       if (tween) tween.kill();
-      clearInterval(timerInterval);
       
       gsap.to(counterObj, {
         val: 100,
@@ -112,7 +119,7 @@ export default function Preloader() {
 
     return () => {
       window.removeEventListener('hero-video-ready', handleVideoReady);
-      clearInterval(timerInterval);
+      window.removeEventListener('hero-video-progress', handleVideoProgress);
       releaseScroll();
     };
 
