@@ -22,7 +22,6 @@ export default function AudioPlayer() {
     window.addEventListener('scroll', handleInteraction, { once: true });
     window.addEventListener('click', handleInteraction, { once: true });
     window.addEventListener('touchstart', handleInteraction, { once: true });
-    window.addEventListener('preloader-finished', handleInteraction, { once: true });
 
     return () => {
       window.removeEventListener('scroll', handleInteraction);

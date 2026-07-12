@@ -4,76 +4,85 @@ import React, { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 export default function Preloader() {
-  const [phase, setPhase] = useState<'buffering' | 'countdown'>('buffering');
-  const [count, setCount] = useState(3);
+  const [progress, setProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-  const elementsRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // 1. Disable scrolling initially (in case it wasn't already caught by the body class)
     document.body.style.overflow = 'hidden';
 
+    // 2. Animate the counter from 0 to 90
+    const duration = 2.0; // Initial simulated load time
+    const counterObj = { val: 0 };
+    
     let isVideoReady = (window as any).heroVideoReady || false;
     
     const handleVideoReady = () => {
-      if (!isVideoReady) {
-        isVideoReady = true;
-        setPhase('countdown');
-      }
+      isVideoReady = true;
+      finishLoading();
     };
 
-    if (isVideoReady) {
-      setPhase('countdown');
-    } else {
-      window.addEventListener('hero-video-ready', handleVideoReady);
-    }
+    window.addEventListener('hero-video-ready', handleVideoReady);
+
+    let tween = gsap.to(counterObj, {
+      val: 90,
+      duration: duration,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        setProgress(Math.round(counterObj.val));
+      },
+      onComplete: () => {
+        if (isVideoReady) {
+          finishLoading();
+        }
+        // If not ready, it will just pause at 90% until the event fires
+      }
+    });
+
+    const finishLoading = () => {
+      // Prevent running multiple times
+      if (counterObj.val === 100) return;
+      
+      gsap.to(counterObj, {
+        val: 100,
+        duration: 0.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          setProgress(Math.round(counterObj.val));
+        },
+        onComplete: () => {
+          // 3. When 100% is reached, smoothly animate the preloader away
+          gsap.to(containerRef.current, {
+            yPercent: -100,
+            duration: 1.2,
+            ease: "power4.inOut",
+            delay: 0.2, // Tiny pause at 100% before swiping up
+            onComplete: () => {
+              // Restore scrolling
+              document.body.style.overflow = 'auto';
+              document.body.classList.remove('overflow-hidden');
+              if (containerRef.current) {
+                 containerRef.current.style.display = 'none';
+              }
+              window.dispatchEvent(new Event('preloader-finished'));
+            }
+          });
+
+          gsap.to(counterRef.current, {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+      });
+    };
 
     return () => {
       window.removeEventListener('hero-video-ready', handleVideoReady);
     };
+
   }, []);
-
-  useEffect(() => {
-    if (phase === 'countdown') {
-      let currentCount = 3;
-      setCount(currentCount);
-
-      const interval = setInterval(() => {
-        currentCount -= 1;
-        if (currentCount > 0) {
-          setCount(currentCount);
-        } else {
-          clearInterval(interval);
-          finishLoading();
-        }
-      }, 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [phase]);
-
-  const finishLoading = () => {
-    // 3. When 0 is reached, smoothly animate the preloader away
-    gsap.to(containerRef.current, {
-      yPercent: -100,
-      duration: 1.2,
-      ease: "power4.inOut",
-      delay: 0.1,
-      onComplete: () => {
-        document.body.style.overflow = 'auto';
-        document.body.classList.remove('overflow-hidden');
-        if (containerRef.current) {
-           containerRef.current.style.display = 'none';
-        }
-        window.dispatchEvent(new Event('preloader-finished'));
-      }
-    });
-
-    gsap.to(elementsRef.current, {
-      opacity: 0,
-      duration: 0.5,
-      ease: "power2.out",
-    });
-  };
 
   return (
     <div 
@@ -86,24 +95,21 @@ export default function Preloader() {
         </h1>
       </div>
       
-      <div ref={elementsRef} className="relative z-10 flex flex-col items-center min-h-[120px] justify-center">
-        {phase === 'buffering' ? (
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-8 h-8 border-2 border-white/10 border-t-white/80 rounded-full animate-spin" />
-            <p className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-mono animate-pulse">
-              Buffering Cinematic Experience
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-[15vw] md:text-[8vw] font-[var(--font-playfair)] italic text-white leading-none tracking-tighter">
-              0{count}
-            </p>
-            <p className="text-[10px] uppercase tracking-[0.4em] text-white/50 font-mono mt-2">
-              Preparing to Immerse
-            </p>
-          </div>
-        )}
+      <div ref={counterRef} className="relative z-10 flex flex-col items-center gap-4">
+        <div className="overflow-hidden">
+          <p className="text-[12vw] md:text-[8vw] font-[var(--font-playfair)] italic text-white leading-none tracking-tighter">
+            {progress}%
+          </p>
+        </div>
+        <div className="w-[200px] h-[1px] bg-white/20 relative overflow-hidden">
+          <div 
+            className="absolute top-0 left-0 h-full bg-white transition-all duration-75 ease-linear"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <p className="text-[9px] uppercase tracking-[0.4em] text-white/50 font-mono mt-4">
+          Loading Experience
+        </p>
       </div>
     </div>
   );
