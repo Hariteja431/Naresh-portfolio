@@ -15,21 +15,27 @@ export default function AudioPlayer() {
         audioRef.current.play().then(() => {
           setIsAudioPlaying(true);
           setHasInteracted(true);
+          // Manually clean up to prevent performance leak on scroll
+          window.removeEventListener('scroll', handleInteraction);
+          window.removeEventListener('click', handleInteraction);
+          window.removeEventListener('touchstart', handleInteraction);
+          window.removeEventListener('preloader-finished', handleInteraction);
         }).catch(() => {
-          // Play failed (e.g. autoplay blocked), do not set hasInteracted to true
+          // Play failed (e.g. autoplay blocked), keep listeners active to try again
         });
       }
     };
 
-    window.addEventListener('scroll', handleInteraction, { once: true });
-    window.addEventListener('click', handleInteraction, { once: true });
-    window.addEventListener('touchstart', handleInteraction, { once: true });
-    window.addEventListener('preloader-finished', handleInteraction, { once: true });
+    window.addEventListener('scroll', handleInteraction);
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    window.addEventListener('preloader-finished', handleInteraction);
 
     return () => {
       window.removeEventListener('scroll', handleInteraction);
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('preloader-finished', handleInteraction);
     };
   }, [hasInteracted]);
 
