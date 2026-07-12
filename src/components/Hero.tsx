@@ -132,6 +132,10 @@ export default function Hero() {
           loop
           playsInline
           preload="auto"
+          onCanPlayThrough={() => {
+            (window as any).heroVideoReady = true;
+            window.dispatchEvent(new Event('hero-video-ready'));
+          }}
           suppressHydrationWarning
           className="w-[100vh] h-[100vw] object-cover -rotate-90 origin-center" 
         />

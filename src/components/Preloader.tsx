@@ -12,46 +12,75 @@ export default function Preloader() {
     // 1. Disable scrolling initially (in case it wasn't already caught by the body class)
     document.body.style.overflow = 'hidden';
 
-    // 2. Animate the counter from 0 to 100
-    const duration = 2.5; // Simulate load time
+    // 2. Animate the counter from 0 to 90
+    const duration = 2.0; // Initial simulated load time
     const counterObj = { val: 0 };
     
-    gsap.to(counterObj, {
-      val: 100,
+    let isVideoReady = (window as any).heroVideoReady || false;
+    
+    const handleVideoReady = () => {
+      isVideoReady = true;
+      finishLoading();
+    };
+
+    window.addEventListener('hero-video-ready', handleVideoReady);
+
+    let tween = gsap.to(counterObj, {
+      val: 90,
       duration: duration,
       ease: "power2.inOut",
       onUpdate: () => {
         setProgress(Math.round(counterObj.val));
       },
       onComplete: () => {
-        // 3. When 100% is reached, smoothly animate the preloader away
-        gsap.to(containerRef.current, {
-          yPercent: -100,
-          duration: 1.2,
-          ease: "power4.inOut",
-          delay: 0.2, // Tiny pause at 100% before swiping up
-          onComplete: () => {
-            // Restore scrolling
-            document.body.style.overflow = 'auto';
-            document.body.classList.remove('overflow-hidden');
-            // Hide preloader from DOM visually completely if needed (though it's off-screen)
-            if (containerRef.current) {
-               containerRef.current.style.display = 'none';
-            }
-            
-            // Dispatch custom event to trigger page entrance animations
-            window.dispatchEvent(new Event('preloader-finished'));
-          }
-        });
-
-        // Also fade out the counter text slightly before the container swipes up
-        gsap.to(counterRef.current, {
-          opacity: 0,
-          duration: 0.5,
-          ease: "power2.out",
-        });
+        if (isVideoReady) {
+          finishLoading();
+        }
+        // If not ready, it will just pause at 90% until the event fires
       }
     });
+
+    const finishLoading = () => {
+      // Prevent running multiple times
+      if (counterObj.val === 100) return;
+      
+      gsap.to(counterObj, {
+        val: 100,
+        duration: 0.5,
+        ease: "power2.out",
+        onUpdate: () => {
+          setProgress(Math.round(counterObj.val));
+        },
+        onComplete: () => {
+          // 3. When 100% is reached, smoothly animate the preloader away
+          gsap.to(containerRef.current, {
+            yPercent: -100,
+            duration: 1.2,
+            ease: "power4.inOut",
+            delay: 0.2, // Tiny pause at 100% before swiping up
+            onComplete: () => {
+              // Restore scrolling
+              document.body.style.overflow = 'auto';
+              document.body.classList.remove('overflow-hidden');
+              if (containerRef.current) {
+                 containerRef.current.style.display = 'none';
+              }
+              window.dispatchEvent(new Event('preloader-finished'));
+            }
+          });
+
+          gsap.to(counterRef.current, {
+            opacity: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+      });
+    };
+
+    return () => {
+      window.removeEventListener('hero-video-ready', handleVideoReady);
+    };
 
   }, []);
 
