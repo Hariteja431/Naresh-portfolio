@@ -5,12 +5,36 @@ import gsap from 'gsap';
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(3);
   const containerRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 1. Disable scrolling initially (in case it wasn't already caught by the body class)
     document.body.style.overflow = 'hidden';
+
+    // Absolute strict scroll blocking
+    const preventScroll = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    };
+    
+    window.addEventListener('wheel', preventScroll, { passive: false });
+    window.addEventListener('touchmove', preventScroll, { passive: false });
+    const preventKeys = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', ' ', 'PageUp', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', preventKeys, { passive: false });
+
+    const releaseScroll = () => {
+      document.body.style.overflow = 'auto';
+      document.body.classList.remove('overflow-hidden');
+      window.removeEventListener('wheel', preventScroll);
+      window.removeEventListener('touchmove', preventScroll);
+      window.removeEventListener('keydown', preventKeys);
+    };
 
     // 2. Animate the counter from 0 to 90
     const duration = 2.0; // Initial simulated load time
@@ -30,18 +54,21 @@ export default function Preloader() {
       duration: duration,
       ease: "power2.inOut",
       onUpdate: () => {
-        setProgress(Math.round(counterObj.val));
+        const p = Math.round(counterObj.val);
+        setProgress(p);
+        // Map progress to estimated time remaining (3s -> 1s)
+        if (p < 30) setTimeLeft(3);
+        else if (p < 60) setTimeLeft(2);
+        else setTimeLeft(1);
       },
       onComplete: () => {
         if (isVideoReady) {
           finishLoading();
         }
-        // If not ready, it will just pause at 90% until the event fires
       }
     });
 
     const finishLoading = () => {
-      // Prevent running multiple times
       if (counterObj.val === 100) return;
       
       gsap.to(counterObj, {
@@ -50,18 +77,16 @@ export default function Preloader() {
         ease: "power2.out",
         onUpdate: () => {
           setProgress(Math.round(counterObj.val));
+          setTimeLeft(0);
         },
         onComplete: () => {
-          // 3. When 100% is reached, smoothly animate the preloader away
           gsap.to(containerRef.current, {
             yPercent: -100,
             duration: 1.2,
             ease: "power4.inOut",
-            delay: 0.2, // Tiny pause at 100% before swiping up
+            delay: 0.2,
             onComplete: () => {
-              // Restore scrolling
-              document.body.style.overflow = 'auto';
-              document.body.classList.remove('overflow-hidden');
+              releaseScroll();
               if (containerRef.current) {
                  containerRef.current.style.display = 'none';
               }
@@ -80,6 +105,7 @@ export default function Preloader() {
 
     return () => {
       window.removeEventListener('hero-video-ready', handleVideoReady);
+      releaseScroll();
     };
 
   }, []);
@@ -107,9 +133,14 @@ export default function Preloader() {
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-[9px] uppercase tracking-[0.4em] text-white/50 font-mono mt-4">
-          Loading Experience
-        </p>
+        <div className="flex flex-col items-center gap-1 mt-4">
+          <p className="text-[9px] uppercase tracking-[0.4em] text-white/50 font-mono">
+            Loading Experience
+          </p>
+          <p className="text-[9px] uppercase tracking-[0.2em] text-white/30 font-mono tabular-nums">
+            Est. Time: 00:0{timeLeft}
+          </p>
+        </div>
       </div>
     </div>
   );
