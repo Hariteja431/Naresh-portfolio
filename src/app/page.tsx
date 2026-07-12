@@ -1,12 +1,9 @@
-import dynamic from 'next/dynamic';
 import Hero from "@/components/Hero";
+import AboutPortrait from "@/components/AboutPortrait";
 import AudioPlayer from "@/components/AudioPlayer";
-
-// Dynamically import downstream components to dramatically reduce initial load time and JS bundle size
-const AboutPortrait = dynamic(() => import('@/components/AboutPortrait'));
-const Monograph = dynamic(() => import('@/components/Monograph'));
-const Videography = dynamic(() => import('@/components/Videography'));
-const InfoSections = dynamic(() => import('@/components/InfoSections'));
+import Monograph from "@/components/Monograph";
+import Videography from "@/components/Videography";
+import InfoSections from "@/components/InfoSections";
 
 export default function Home() {
   return (
