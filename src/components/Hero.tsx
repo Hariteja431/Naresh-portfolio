@@ -131,6 +131,7 @@ export default function Hero() {
           muted
           loop
           playsInline
+          preload="auto"
           suppressHydrationWarning
           className="w-[100vh] h-[100vw] object-cover -rotate-90 origin-center" 
         />

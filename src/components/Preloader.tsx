@@ -13,7 +13,7 @@ export default function Preloader() {
     document.body.style.overflow = 'hidden';
 
     // 2. Animate the counter from 0 to 100
-    const duration = 2.5; // Simulate load time
+    const duration = 0.8; // Reduced load time for much snappier initial experience
     const counterObj = { val: 0 };
     
     gsap.to(counterObj, {
