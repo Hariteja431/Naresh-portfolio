@@ -17,6 +17,9 @@ export default function AudioPlayer() {
           setHasInteracted(true);
           // Manually clean up to prevent performance leak on scroll
           window.removeEventListener('scroll', handleInteraction);
+          window.removeEventListener('wheel', handleInteraction);
+          window.removeEventListener('mousemove', handleInteraction);
+          window.removeEventListener('keydown', handleInteraction);
           window.removeEventListener('click', handleInteraction);
           window.removeEventListener('touchstart', handleInteraction);
           window.removeEventListener('preloader-finished', handleInteraction);
@@ -26,13 +29,19 @@ export default function AudioPlayer() {
       }
     };
 
-    window.addEventListener('scroll', handleInteraction);
-    window.addEventListener('click', handleInteraction);
-    window.addEventListener('touchstart', handleInteraction);
-    window.addEventListener('preloader-finished', handleInteraction);
+    window.addEventListener('scroll', handleInteraction, { passive: true });
+    window.addEventListener('wheel', handleInteraction, { passive: true });
+    window.addEventListener('mousemove', handleInteraction, { passive: true });
+    window.addEventListener('keydown', handleInteraction, { passive: true });
+    window.addEventListener('click', handleInteraction, { passive: true });
+    window.addEventListener('touchstart', handleInteraction, { passive: true });
+    window.addEventListener('preloader-finished', handleInteraction, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleInteraction);
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('mousemove', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
       window.removeEventListener('click', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
       window.removeEventListener('preloader-finished', handleInteraction);
