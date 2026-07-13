@@ -5,7 +5,7 @@ import gsap from 'gsap';
 
 export default function Preloader() {
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(20);
   const containerRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +36,7 @@ export default function Preloader() {
       window.removeEventListener('keydown', preventKeys);
     };
 
-    const duration = 15.0;
+    const duration = 20.0;
     const counterObj = { val: 0 };
     let isVideoReady = (window as any).heroVideoReady || false;
     let isForcedTimeout = false;
