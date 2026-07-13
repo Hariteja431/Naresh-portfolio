@@ -206,7 +206,7 @@ export default function Hero() {
         ref={scrollIndicatorRef} 
         className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-50 pointer-events-none"
       >
-        <span className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-mono drop-shadow-md">Scroll</span>
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/50 font-mono drop-shadow-md whitespace-nowrap">Tap & scroll</span>
         <div className="w-[1px] h-12 bg-white/20 overflow-hidden relative">
           <div className="w-full h-full bg-white origin-top animate-scroll-down" />
         </div>

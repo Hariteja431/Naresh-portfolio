@@ -122,7 +122,7 @@ function CategoryStage({ categoryId, title, subtitle, videos }: CategoryStagePro
         
         {/* Cinematic Header */}
         <div className="mb-4 md:mb-6 flex flex-col items-center text-center">
-           <h2 className="text-3xl md:text-5xl font-serif italic tracking-wider text-white mb-1 md:mb-2 shadow-black drop-shadow-2xl">{title}</h2>
+           <h2 className="text-[10vw] md:text-[5vw] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/30 leading-none mb-2 md:mb-3 drop-shadow-2xl">{title}</h2>
            <p className="text-[10px] md:text-sm text-zinc-400 tracking-[0.2em] uppercase font-light">{subtitle}</p>
         </div>
 
@@ -168,8 +168,8 @@ function CategoryStage({ categoryId, title, subtitle, videos }: CategoryStagePro
 
            {/* Dynamic Video Title & One-Liner Description */}
            <div className="mt-4 md:mt-6 flex flex-col items-center text-center px-4 max-w-xl h-[55px] md:h-[60px] justify-start transition-opacity duration-500">
-              <h3 className="text-base md:text-xl font-serif text-white tracking-[0.2em] uppercase opacity-90">{videos[activeIndex].title}</h3>
-              <p className="text-[10px] md:text-sm text-zinc-400 mt-1 md:mt-2 font-light italic tracking-wide">{videos[activeIndex].description}</p>
+              <h3 className="text-base md:text-xl font-bold text-white tracking-[0.2em] uppercase opacity-90">{videos[activeIndex].title}</h3>
+              <p className="text-[10px] md:text-sm text-zinc-400 mt-1 md:mt-2 font-light tracking-wide">{videos[activeIndex].description}</p>
            </div>
 
            {/* External Controls & Film Strip (Centered matching the mock) */}
